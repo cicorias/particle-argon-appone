@@ -1,3 +1,9 @@
+/******************************************************/
+//       THIS IS A GENERATED FILE - DO NOT EDIT       //
+/******************************************************/
+
+#include "Particle.h"
+#line 1 "/Users/cicorias/g/learn/particle/appone/AppOne/src/AppOne.ino"
 // ------------
 // Blink an LED
 // ------------
@@ -25,6 +31,10 @@ It blinks the D7 LED on your Particle device. If you have an LED wired to D0, it
 // First, we're going to make some variables.
 // This is our "shorthand" that we'll use throughout the program:
 
+void setup();
+void publish();
+void loop();
+#line 28 "/Users/cicorias/g/learn/particle/appone/AppOne/src/AppOne.ino"
 int led1 = D0; // Instead of writing D0 over and over again, we'll write led1
 // You'll need to wire an LED to this one to see it blink.
 
