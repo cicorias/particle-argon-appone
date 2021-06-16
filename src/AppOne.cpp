@@ -25,11 +25,11 @@ SerialLogHandler logHandler;
 void getSensor();
 
 // This is the event name to publish
-const char *eventName = "wifiQuality";
+const char *eventName = "bd.ep.1.critical.loc"; //bd-wifiQuality";  com.bd.area.stuff.wifiquality
 
 // This is how often to publish (30s = every 30 seconds)
 // Other useful units include min for minutes and h for hours.
-std::chrono::milliseconds publishPeriod = 2min; //5s;
+std::chrono::milliseconds publishPeriod = 2min; //10s; //2min; //5s;
 
 // This keeps track of the last time we published
 unsigned long lastPublishMs;
@@ -64,11 +64,21 @@ void publish(){
         getSensor();
         // The event data is string but we just send our value as
         // a ASCII formatted decimal number
-        String eventData = String::format("{ \"level\":  \"%.02f%\", \"quality\": \"%.02f%%\" }", bag.level, bag.quality);
+        String eventData = String::format("{\"body\": { \"level\":  \"%.02f%\", \"quality\": \"%.02f%%\" }}", bag.level, bag.quality);
+
+
+        char buf[1024];
+        JSONBufferWriter writer(buf, sizeof(buf));
+        writer.beginObject();
+          writer.name("level").value(bag.level);
+          writer.name("quality").value(bag.quality);
+        writer.endObject();
+        writer.buffer()[std::min(writer.bufferSize(), writer.dataSize())] = 0;
 
         // Make sure we're cloud connected before publishing
         if (Particle.connected())
         {
+            // Particle.publish(eventName, buf);
             Particle.publish(eventName, eventData);
 
             Log.info("published %s", eventData.c_str());
