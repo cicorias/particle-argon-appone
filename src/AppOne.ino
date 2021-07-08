@@ -15,7 +15,7 @@ SerialLogHandler logHandler;
 void getSensor();
 
 // This is the event name to publish
-const char *eventName = "bd.ep.1.critical.loc"; //bd-wifiQuality";  com.bd.area.stuff.wifiquality
+const char *eventName = "bd-ep1-critical-loc"; //bd-wifiQuality";  com.bd.area.stuff.wifiquality
 
 // This is how often to publish (30s = every 30 seconds)
 // Other useful units include min for minutes and h for hours.
@@ -39,12 +39,14 @@ void setup() {
 struct values {
   float quality;
   float level;
+  uint correlationid;
 } bag;
 
 void getSensor(){
   WiFiSignal sig = WiFi.RSSI();
   bag.level = sig.getQualityValue();
   bag.quality = sig.getQuality();
+  bag.correlationid = HAL_RNG_GetRandomNumber();
 }
 
 void publish(){
@@ -54,28 +56,32 @@ void publish(){
         getSensor();
         // The event data is string but we just send our value as
         // a ASCII formatted decimal number
-        String eventData = String::format("{\"body\": { \"level\":  \"%.02f%\", \"quality\": \"%.02f%%\" }}", bag.level, bag.quality);
+        // String eventData = String::format("{\"body\": { \"level\":  \"%.02f%\", \"quality\": \"%.02f%%\" }}", bag.level, bag.quality);
 
+        String cor_st = String::format("%x%", bag.correlationid);
 
         char buf[1024];
+        memset(buf, 0, sizeof(buf));
         JSONBufferWriter writer(buf, sizeof(buf));
         writer.beginObject();
           writer.name("level").value(bag.level);
           writer.name("quality").value(bag.quality);
+          writer.name("corrid").value(bag.correlationid);
+          writer.name("correlationId").value(cor_st);
         writer.endObject();
         writer.buffer()[std::min(writer.bufferSize(), writer.dataSize())] = 0;
 
         // Make sure we're cloud connected before publishing
         if (Particle.connected())
         {
-            // Particle.publish(eventName, buf);
-            Particle.publish(eventName, eventData);
+            Particle.publish(eventName, buf);
+            //Particle.publish(eventName, eventData);
 
-            Log.info("published %s", eventData.c_str());
+            Log.info("published %s", buf);
         }
         else
         {
-            Log.info("not cloud connected %s", eventData.c_str());
+            Log.info("not cloud connected %s", buf);
         }
     }
 }
