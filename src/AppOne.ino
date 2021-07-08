@@ -19,7 +19,7 @@ const char *eventName = "bd.ep.1.critical.loc"; //bd-wifiQuality";  com.bd.area.
 
 // This is how often to publish (30s = every 30 seconds)
 // Other useful units include min for minutes and h for hours.
-std::chrono::milliseconds publishPeriod = 2min; //10s; //2min; //5s;
+std::chrono::milliseconds publishPeriod = 30s; //10s; //2min; //5s;
 
 // This keeps track of the last time we published
 unsigned long lastPublishMs;
